@@ -36,5 +36,6 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-keys.txt
 keys.properties
+
+application.yml
