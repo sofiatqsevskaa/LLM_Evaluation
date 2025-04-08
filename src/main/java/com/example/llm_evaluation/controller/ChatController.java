@@ -1,6 +1,7 @@
-package web.controllers;
+package com.example.llm_evaluation.controller;
 
-import service.OpenRouterService;
+import com.example.llm_evaluation.model.Inquiry;
+import com.example.llm_evaluation.service.OpenRouterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,8 +13,7 @@ public class ChatController {
     private OpenRouterService openRouterService;
 
     @PostMapping("/inquiry")
-    public String[] getChatResponses(@RequestBody String inquiry) {
-        // Get responses from multiple models
+    public String[] getChatResponses(@RequestBody Inquiry inquiry) {
         return openRouterService.getMultipleResponses(inquiry);
     }
 }
