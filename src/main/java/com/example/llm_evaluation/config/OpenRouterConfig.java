@@ -12,9 +12,6 @@ import java.util.List;
 
 @Configuration
 public class OpenRouterConfig {
-
-
-
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -26,25 +23,18 @@ public class OpenRouterConfig {
     @Value("${openrouter.api.url}")
     private String apiUrl;
 
-    private static final List<String> MODELS = Arrays.asList("gpt-3.5", "gpt-4", "claude", "paLM");
+    private static final List<String> MODELS = Arrays.asList("agentica-org/deepcoder-14b-preview:free", "deepseek/deepseek-chat-v3-0324:free", "google/gemini-2.5-pro-exp-03-25:free", "openrouter/optimus-alpha");
 
     public String getApiKey() {
         return apiKey;
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
     }
 
     public String getApiUrl() {
         return apiUrl;
     }
 
-    public void setApiUrl(String apiUrl) {
-        this.apiUrl = apiUrl;
-    }
-
-    public static List<String> getModels() {
+    public List<String> getModels() {
         return MODELS;
     }
+
 }

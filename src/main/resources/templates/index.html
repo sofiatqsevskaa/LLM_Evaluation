@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:method="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +9,11 @@
 
 <h1>Chat with LLMs</h1>
 
-<textarea id="inquiryContent" name="inquiryContent" placeholder="Enter your query..." rows="4" cols="50" th:method="POST" th:action="@{'/chat/inquiry'}" ></textarea><br><br>
-
-<button id="submitButton">Submit</button>
+<form method="POST" action="/inquiry">
+    <label for="inquiryContent">Inquiry...</label><br>
+    <textarea id="inquiryContent" name="inquiryContent" placeholder="Enter your query..." rows="4" cols="50"></textarea><br><br>
+    <button type="submit" id="submitButton">Submit</button>
+</form>
 
 <div id="responseContainer"></div>
 
