@@ -10,4 +10,5 @@ public interface InquiryService {
     List<Inquiry> findAll();
     Inquiry find(String inquiry);
     List<Answer> findAnswers(String inquiry);
+    Inquiry saveInquiry(String inquiry);
 }

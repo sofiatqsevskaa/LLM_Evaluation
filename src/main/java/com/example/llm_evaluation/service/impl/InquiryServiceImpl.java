@@ -35,4 +35,9 @@ public class InquiryServiceImpl implements InquiryService {
         Inquiry inq = inquiryRepository.findByInquiry(inquiry);
         return answerRepository.findByInquiry(inq);
     }
+
+    @Override
+    public Inquiry saveInquiry(String inquiry) {
+        return inquiryRepository.save(new Inquiry(inquiry));
+    }
 }

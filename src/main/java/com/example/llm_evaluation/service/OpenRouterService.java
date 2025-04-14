@@ -22,6 +22,8 @@ public class OpenRouterService {
 
     public String respond(String inquiry, String model) {
         String apiUrl = openRouterConfig.getApiUrl();
+
+
         String requestBody = "{"
                 + "\"model\": \"" + model + "\","
                 + "\"messages\": [{\"role\": \"user\", \"content\": \"" + inquiry + "\"}]"

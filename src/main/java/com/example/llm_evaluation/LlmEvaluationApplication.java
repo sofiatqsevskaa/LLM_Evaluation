@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @SpringBootApplication
 public class LlmEvaluationApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(LlmEvaluationApplication.class, args);
     }

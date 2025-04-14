@@ -1,19 +1,28 @@
 package com.example.llm_evaluation.controller;
 
 import com.example.llm_evaluation.model.Inquiry;
+import com.example.llm_evaluation.service.InquiryService;
 import com.example.llm_evaluation.service.OpenRouterService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/chat")
-public class ChatController {
+import java.util.Optional;
 
-    @Autowired
+@RestController
+@RequestMapping("/chat")
+public class ChatController {
     private OpenRouterService openRouterService;
+    private final InquiryService inquiryService;
+
+    public ChatController(InquiryService inquiryService) {
+        this.inquiryService = inquiryService;
+    }
 
     @PostMapping("/inquiry")
-    public String[] getChatResponses(@RequestBody Inquiry inquiry) {
+    public String[] getChatResponses(@RequestParam String inquiryContent) {
+        System.out.println("Inquiry: "+inquiryContent);
+        Inquiry inquiry = Optional.ofNullable(inquiryService.find(inquiryContent))
+                .orElseGet(() -> inquiryService.saveInquiry(inquiryContent));
         return openRouterService.getMultipleResponses(inquiry);
     }
+
 }
