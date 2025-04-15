@@ -57,6 +57,7 @@ public class OpenRouterService {
             responses[i] = respond(inquiry.getInquiry(), model);
             Answer answer = new Answer(model, responses[i], inquiry);
             answerRepository.save(answer);
+            answers.add(answer);
         }
         return answers;
     }

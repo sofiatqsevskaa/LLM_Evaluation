@@ -15,7 +15,15 @@
     <button type="submit" id="submitButton">Submit</button>
 </form>
 
-<div id="responseContainer"></div>
+<div id="responseContainer" th:if="${answers != null}">
+    <ul th:if="${!#lists.isEmpty(answers)}" th:each="answer : ${answers}">
+        <li>
+            <strong th:text="${answer.getModel()}">Model</strong>:
+            <span th:text="${answer.getAnswer()}">Answer</span>
+        </li>
+    </ul>
+</div>
+
 
 </body>
 </html>

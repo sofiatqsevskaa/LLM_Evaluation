@@ -1,8 +1,6 @@
 package com.example.llm_evaluation.config;
 
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -23,7 +21,7 @@ public class OpenRouterConfig {
     @Value("${openrouter.api.url}")
     private String apiUrl;
 
-    private static final List<String> MODELS = Arrays.asList("agentica-org/deepcoder-14b-preview:free", "deepseek/deepseek-chat-v3-0324:free", "google/gemini-2.5-pro-exp-03-25:free", "openrouter/optimus-alpha");
+    private static final List<String> MODELS = Arrays.asList("agentica-org/deepcoder-14b-preview:free", "deepseek/deepseek-chat-v3-0324:free", "google/gemini-2.5-pro-exp-03-25:free");
 
     public String getApiKey() {
         return apiKey;

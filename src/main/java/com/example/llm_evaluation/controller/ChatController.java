@@ -25,10 +25,11 @@ public class ChatController {
     }
 
     @PostMapping("/inquiry")
-    @ResponseBody
-    public Long createInquiry(@RequestParam String inquiryContent) {
+    public String createInquiry(@RequestParam String inquiryContent, Model model) {
         Inquiry inquiry = Optional.ofNullable(inquiryService.find(inquiryContent))
                 .orElseGet(() -> inquiryService.saveInquiry(inquiryContent));
-        return inquiry.getId();
+        List<Answer> answers = openRouterService.getMultipleResponses(inquiry);
+        model.addAttribute("answers", answers);
+        return "index";
     }
 }
