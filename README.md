@@ -17,7 +17,7 @@ The following models are currently queried via OpenRouter:
 - agentica-org/deepcoder-14b-preview:free
 - deepseek/deepseek-chat-v3-0324:free
 - google/gemini-2.5-pro-exp-03-25:free
-- openrouter/optimus-alpha
+- qwen/qwq-32b:free
 
 ## How to Use
 
