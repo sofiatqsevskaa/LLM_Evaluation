@@ -9,4 +9,5 @@ import java.util.List;
 @Service
 public interface AnswerService {
     List<Answer> findByInquiry(Inquiry inquiry);
+    void saveAnswer(Answer answer);
 }

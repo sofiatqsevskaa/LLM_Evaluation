@@ -20,4 +20,10 @@ public class AnswerServiceImpl implements AnswerService {
     public List<Answer> findByInquiry(Inquiry inquiry) {
         return answerRepository.findByInquiry(inquiry);
     }
+
+    @Override
+    public void saveAnswer(Answer answer) {
+        answerRepository.save(answer);
+    }
+
 }

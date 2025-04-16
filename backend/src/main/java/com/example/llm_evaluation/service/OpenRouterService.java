@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
 import com.fasterxml.jackson.databind.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,15 +36,26 @@ public class OpenRouterService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + openRouterConfig.getApiKey());
-        headers.set("Content-Type", "application/json");
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
 
         try {
             JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode messageNode = root.path("choices").get(0).path("message").path("content");
-            return messageNode.asText();
+            JsonNode choices = root.path("choices");
+
+            if (choices.isArray() && !choices.isEmpty()) {
+                JsonNode messageNode = choices.get(0).path("message").path("content");
+                if (!messageNode.isMissingNode()) {
+                    return messageNode.asText();
+                } else {
+                    return "Error: Missing 'content' field in response";
+                }
+            } else {
+                return "Error: 'choices' array is missing or empty";
+            }
+
         } catch (Exception e) {
             return "Error parsing response: " + e.getMessage();
         }
