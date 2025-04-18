@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 
 interface Answer {
     model: string;
@@ -6,9 +6,17 @@ interface Answer {
 }
 
 const ChatComponent: React.FC = () => {
+    const [models, setModels] = useState<string[]>([]);
     const [inquiryContent, setInquiryContent] = useState("");
     const [answers, setAnswers] = useState<Answer[]>([]);
     const [loadingModels, setLoadingModels] = useState<string[]>([]);
+
+    useEffect(() => {
+        fetch("http://localhost:9091/models")
+            .then((res) => res.json())
+            .then((data) => {console.log(data);setModels(data)})
+            .catch((err) => console.error("Failed to fetch models:", err));
+    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,7 +34,7 @@ const ChatComponent: React.FC = () => {
             eventSource.close();
         };
 
-        setLoadingModels(["agentica-org/deepcoder-14b-preview:free", "deepseek/deepseek-chat-v3-0324:free", "google/gemini-2.5-pro-exp-03-25:free"]);
+        setLoadingModels([...models]);
     };
 
     return (

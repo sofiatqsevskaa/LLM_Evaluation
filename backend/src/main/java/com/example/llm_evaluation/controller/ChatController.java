@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -24,6 +25,12 @@ public class ChatController {
         this.inquiryService = inquiryService;
         this.answerService = answerService;
         this.openRouterConfig = openRouterConfig;
+    }
+
+    @GetMapping("/models")
+    @ResponseBody
+    public List<String> getModels(){
+        return openRouterConfig.getModels();
     }
 
     @GetMapping("/inquiry/stream")
