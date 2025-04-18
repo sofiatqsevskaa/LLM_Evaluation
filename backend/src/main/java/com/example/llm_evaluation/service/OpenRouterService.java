@@ -40,7 +40,7 @@ public class OpenRouterService {
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
-
+        System.out.println("Response: " + response.getBody());
         try {
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode choices = root.path("choices");

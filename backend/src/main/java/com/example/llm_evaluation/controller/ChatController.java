@@ -6,14 +6,20 @@ import com.example.llm_evaluation.model.Inquiry;
 import com.example.llm_evaluation.service.AnswerService;
 import com.example.llm_evaluation.service.InquiryService;
 import com.example.llm_evaluation.service.OpenRouterService;
-import org.springframework.stereotype.Controller;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-@Controller
+@RestController
+@RequestMapping("/inquiry")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ChatController {
     private final OpenRouterService openRouterService;
     private final InquiryService inquiryService;
@@ -29,12 +35,12 @@ public class ChatController {
 
     @GetMapping("/models")
     @ResponseBody
-    public List<String> getModels(){
+    public List<String> getModels() {
         return openRouterConfig.getModels();
     }
 
-    @GetMapping("/inquiry/stream")
-    public SseEmitter streamInquiry(@RequestParam String inquiryContent) {
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamInquiry(@RequestParam String inquiryContent, @RequestParam String model) {
         SseEmitter emitter = new SseEmitter();
 
         new Thread(() -> {
@@ -42,14 +48,11 @@ public class ChatController {
                 Inquiry inquiry = Optional.ofNullable(inquiryService.find(inquiryContent))
                         .orElseGet(() -> inquiryService.saveInquiry(inquiryContent));
 
-                for (String model : openRouterConfig.getModels()) {
-                    String response = openRouterService.respond(inquiryContent, model);
-                    Answer answer = new Answer(model, response, inquiry);
-                    answerService.saveAnswer(answer);
+                String response = openRouterService.respond(inquiryContent, model);
+                Answer answer = new Answer(model, response, inquiry);
+                answerService.saveAnswer(answer);
 
-                    emitter.send(answer); // Send each answer immediately
-                }
-
+                emitter.send(answer); // Send the answer for the specific model
                 emitter.complete(); // Done sending
 
             } catch (Exception e) {
