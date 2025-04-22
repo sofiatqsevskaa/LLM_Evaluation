@@ -13,10 +13,9 @@ This is a simple web application for evaluating and comparing responses from mul
 ## Contacted Models
 
 The following models are currently queried via OpenRouter:
-
 - agentica-org/deepcoder-14b-preview:free
 - deepseek/deepseek-chat-v3-0324:free
-- google/gemini-2.5-pro-exp-03-25:free
+- shisa-ai/shisa-v2-llama3.3-70b:free
 - qwen/qwq-32b:free
 
 ## How to Use

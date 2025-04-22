@@ -1,0 +1,20 @@
+{
+  "name": "llm_evaluation",
+  "version": "1.0.0",
+  "description": "This is a simple web application for evaluating and comparing responses from multiple large language models (LLMs) from Open Router to the same inquiry.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sofiatqsevskaa/LLM_Evaluation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sofiatqsevskaa/LLM_Evaluation/issues"
+  },
+  "homepage": "https://github.com/sofiatqsevskaa/LLM_Evaluation#readme"
+}
