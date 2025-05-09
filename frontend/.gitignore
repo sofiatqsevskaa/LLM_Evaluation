@@ -21,3 +21,30 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Node.js
+node_modules/
+pnpm-debug.log*
+dist/
+.build/
+.cache/
+.next/
+out/
+.vite/
+coverage/
+
+# dotenv environment variables
+.env
+# TypeScript
+*.tsbuildinfo
+
+
+# VSCode
+.vscode/
+
+# React
+build/
+
+# Logs
+logs/
+*.log
