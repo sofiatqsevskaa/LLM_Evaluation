@@ -21,7 +21,7 @@ public class OpenRouterConfig {
     @Value("${openrouter.api.url}")
     private String apiUrl;
 
-    private static final List<String> MODELS = Arrays.asList("agentica-org/deepcoder-14b-preview:free", "deepseek/deepseek-chat-v3-0324:free", "shisa-ai/shisa-v2-llama3.3-70b:free", "qwen/qwq-32b:free");
+    private static final List<String> MODELS = Arrays.asList("opengvlab/internvl3-14b:free", "allenai/molmo-7b-d:free", "meta-llama/llama-4-maverick:free", "qwen/qwen2.5-vl-3b-instruct:free");
 
     public String getApiKey() {
         return apiKey;

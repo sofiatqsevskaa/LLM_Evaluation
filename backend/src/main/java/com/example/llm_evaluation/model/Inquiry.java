@@ -10,6 +10,7 @@ public class Inquiry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Lob
     @Column(unique = true)
     private String inquiry;
     public Inquiry(String inquiry) {
