@@ -49,6 +49,7 @@ const ModelSelectionPage: FC<ModelSelectionPageProps> = ({onModelsSelected}) => 
 
     return (
         <div className="container">
+            <h1 className="h1 text-center text-primary mb-4">Choose Your Models</h1>
             <div className="row">
                 {modelCards}
             </div>

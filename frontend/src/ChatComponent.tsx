@@ -8,11 +8,12 @@ interface Answer {
     answer: string;
 }
 
-interface ChatComponentProps{
+interface ChatComponentProps {
     models: string[];
+    onChangeModels: () => void;
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({models}) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({models, onChangeModels}) => {
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [statusMap, setStatusMap] = useState<Record<string, 'loading' | 'success' | 'error'>>({});
     const [inquiryContent, setInquiryContent] = useState("");
@@ -164,7 +165,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({models}) => {
             </form>
 
             <div className="form-group mt-3 d-flex justify-content-end">
-                <button className="btn btn-primary" onClick={ /*function to implement model change*/}>
+                <button className="btn btn-primary" onClick={onChangeModels}>
                     Change Models
                 </button>
             </div>

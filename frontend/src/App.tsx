@@ -9,10 +9,10 @@ function App() {
         setSelectedModels(models);
     }, []);
 
-    if (selectedModels.length == 0) {
+    if (selectedModels.length === 0) {
         return <ModelSelectionPage onModelsSelected={handleModelsSelected} />;
     } else {
-        return <ChatComponent models={selectedModels}/>;
+        return <ChatComponent models={selectedModels} onChangeModels={() => setSelectedModels([])} />;
     }
 }
 
