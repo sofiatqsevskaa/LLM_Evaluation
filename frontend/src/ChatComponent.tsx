@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, {useEffect, useState, useRef} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ReactMarkdown from 'react-markdown';
+
 
 interface Answer {
     model: string;
@@ -57,22 +59,22 @@ const ChatComponent: React.FC = () => {
             let result = "";
 
             while (true) {
-                const { value, done } = await reader!.read();
+                const {value, done} = await reader!.read();
                 if (done) break;
 
-                result += decoder.decode(value, { stream: true });
+                result += decoder.decode(value, {stream: true});
 
                 const events = result.split("\n\n");
                 for (const evt of events) {
                     if (evt.startsWith("data:")) {
                         try {
                             const json = JSON.parse(evt.replace("data:", "").trim());
-                            setAnswers((prev) => ({ ...prev, [json.model]: json.answer }));
-                            setStatusMap((prev) => ({ ...prev, [json.model]: 'success' }));
+                            setAnswers((prev) => ({...prev, [json.model]: json.answer}));
+                            setStatusMap((prev) => ({...prev, [json.model]: 'success'}));
                         } catch (e) {
                             console.error("Invalid SSE data:", e);
-                            setAnswers((prev) => ({ ...prev, [model]: "Failed to parse response." }));
-                            setStatusMap((prev) => ({ ...prev, [model]: 'error' }));
+                            setAnswers((prev) => ({...prev, [model]: "Failed to parse response."}));
+                            setStatusMap((prev) => ({...prev, [model]: 'error'}));
                         }
                     }
                 }
@@ -100,22 +102,22 @@ const ChatComponent: React.FC = () => {
 
         eventSource.onmessage = (event) => {
             const data: Answer = JSON.parse(event.data);
-            setAnswers((prev) => ({ ...prev, [data.model]: data.answer }));
-            setStatusMap((prev) => ({ ...prev, [data.model]: 'success' }));
+            setAnswers((prev) => ({...prev, [data.model]: data.answer}));
+            setStatusMap((prev) => ({...prev, [data.model]: 'success'}));
             eventSource.close();
         };
 
         eventSource.onerror = (err) => {
             console.error("EventSource error for model", model, ":", err);
-            setAnswers((prev) => ({ ...prev, [model]: "Failed to load response." }));
-            setStatusMap((prev) => ({ ...prev, [model]: 'error' }));
+            setAnswers((prev) => ({...prev, [model]: "Failed to load response."}));
+            setStatusMap((prev) => ({...prev, [model]: 'error'}));
             eventSource.close();
         };
     };
 
     const retryModel = (model: string) => {
-        setAnswers((prev) => ({ ...prev, [model]: "" }));
-        setStatusMap((prev) => ({ ...prev, [model]: 'loading' }));
+        setAnswers((prev) => ({...prev, [model]: ""}));
+        setStatusMap((prev) => ({...prev, [model]: 'loading'}));
         if (selectedFile) {
             sendImageToModel(model);
         } else {
@@ -190,7 +192,11 @@ const ChatComponent: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <p className="card-text white-space-pre-line">{answers[model]}</p>
+                                        <p className="card-text white-space-pre-line">
+                                            <ReactMarkdown>
+                                                {answers[model]}
+                                            </ReactMarkdown>
+                                        </p>
                                         <button
                                             className="btn btn-outline-primary btn-sm mt-2"
                                             onClick={() => retryModel(model)}
