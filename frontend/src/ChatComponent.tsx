@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, { useState, useRef} from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactMarkdown from 'react-markdown';
 
@@ -8,20 +8,16 @@ interface Answer {
     answer: string;
 }
 
-const ChatComponent: React.FC = () => {
-    const [models, setModels] = useState<string[]>([]);
+interface ChatComponentProps{
+    models: string[];
+}
+
+const ChatComponent: React.FC<ChatComponentProps> = ({models}) => {
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [statusMap, setStatusMap] = useState<Record<string, 'loading' | 'success' | 'error'>>({});
     const [inquiryContent, setInquiryContent] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        fetch("http://localhost:9091/inquiry/models")
-            .then((res) => res.json())
-            .then((data) => setModels(data))
-            .catch((err) => console.error("Failed to fetch models:", err));
-    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -166,6 +162,12 @@ const ChatComponent: React.FC = () => {
                     Send Inquiry
                 </button>
             </form>
+
+            <div className="form-group mt-3 d-flex justify-content-end">
+                <button className="btn btn-primary" onClick={ /*function to implement model change*/}>
+                    Change Models
+                </button>
+            </div>
 
             <div className="row">
                 {models.map((model) => (

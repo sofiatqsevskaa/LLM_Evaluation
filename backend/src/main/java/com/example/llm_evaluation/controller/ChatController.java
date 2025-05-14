@@ -1,6 +1,5 @@
 package com.example.llm_evaluation.controller;
 
-import com.example.llm_evaluation.config.OpenRouterConfig;
 import com.example.llm_evaluation.model.Answer;
 import com.example.llm_evaluation.model.Inquiry;
 import com.example.llm_evaluation.service.AnswerService;
@@ -22,19 +21,17 @@ public class ChatController {
     private final OpenRouterService openRouterService;
     private final InquiryService inquiryService;
     private final AnswerService answerService;
-    private final OpenRouterConfig openRouterConfig;
 
-    public ChatController(OpenRouterService openRouterService, InquiryService inquiryService, AnswerService answerService, OpenRouterConfig openRouterConfig) {
+    public ChatController(OpenRouterService openRouterService, InquiryService inquiryService, AnswerService answerService) {
         this.openRouterService = openRouterService;
         this.inquiryService = inquiryService;
         this.answerService = answerService;
-        this.openRouterConfig = openRouterConfig;
     }
 
     @GetMapping("/models")
     @ResponseBody
     public List<String> getModels() {
-        return openRouterConfig.getModels();
+        return openRouterService.fetchFreeModels();
     }
 
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -91,7 +88,6 @@ public class ChatController {
 
         return emitter;
     }
-
 
 
 }
