@@ -1,4 +1,4 @@
-import React, {useState, useEffect, FC, ChangeEvent} from "react";
+import React, {useState, useEffect, FC} from "react";
 import axios from "axios";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -25,10 +25,6 @@ const ModelSelectionPage: FC<ModelSelectionPageProps> = ({onModelsSelected}) => 
             setSelectedModels([...selectedModels, selectedModel]);
         }
     }
-
-    const handleStart = () => {
-        onModelsSelected(selectedModels);
-    };
 
     const modelCards = models.map((model: string, index: number) => {
         return (
@@ -61,29 +57,6 @@ const ModelSelectionPage: FC<ModelSelectionPageProps> = ({onModelsSelected}) => 
             </button>
         </div>
     );
-
-    // return (
-    //     <div>
-    //         <h1>Select Models</h1>
-    //
-    //         {models.map((model) =>
-    //             <div key={model}>
-    //                 <label>
-    //                     <input
-    //                         type="checkbox"
-    //                         checked={selectedModels.includes(model)}
-    //                         onChange={(e) => handleCheckbox(model, e)}
-    //                     />
-    //                     {model}
-    //                 </label>
-    //             </div>
-    //         )}
-    //
-    //         <button onClick={handleStart}>
-    //             Start Chat
-    //         </button>
-    //     </div>
-    // );
 }
 
 export default ModelSelectionPage;
