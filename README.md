@@ -4,19 +4,10 @@ This is a simple web application for evaluating and comparing responses from mul
 
 ## Features
 
-- Sends a single inquiry to four different LLMs
-- Each model responds independently
-- Responses are saved and displayed per inquiry
-- Built using Spring Boot (React frontend in progress)
-- Clean separation of concerns between controllers and services
-
-## Contacted Models
-
-The following models are currently queried via OpenRouter:
-- agentica-org/deepcoder-14b-preview:free
-- deepseek/deepseek-chat-v3-0324:free
-- shisa-ai/shisa-v2-llama3.3-70b:free
-- qwen/qwq-32b:free
+- Send a single inquiry to multiple LLMs
+- Choose from any free model available on OpenRouter
+- Display and compare model responses per inquiry
+- Persist responses for historical reference
 
 ## How to Use
 
@@ -59,5 +50,3 @@ The following models are currently queried via OpenRouter:
     - Running the frontend will automatically open the app on your default browser.
    - You can now test the evaluation of responses from the different LLMs.
 
-## Status
-Backend and frontend are functional. Evaluating techniques are in development.
