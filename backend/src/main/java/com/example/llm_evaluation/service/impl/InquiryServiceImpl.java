@@ -9,6 +9,7 @@ import com.example.llm_evaluation.repository.AnswerRepository;
 import com.example.llm_evaluation.repository.InquiryRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InquiryServiceImpl implements InquiryService {
@@ -51,5 +52,10 @@ public class InquiryServiceImpl implements InquiryService {
             return inquiryRepository.findByInquiry(inquiryContent)
                     .orElseThrow(() -> new IllegalArgumentException("Duplicate inquiry detected: " + inquiryContent, e));
         }
+    }
+
+    @Override
+    public Optional<Inquiry> findById(Long inquiryId) {
+        return inquiryRepository.findById(inquiryId);
     }
 }

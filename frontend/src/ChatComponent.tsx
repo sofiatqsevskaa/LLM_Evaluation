@@ -1,11 +1,11 @@
-import React, { useState, useRef} from "react";
+import React, { useState, useRef, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactMarkdown from 'react-markdown';
-
 
 interface Answer {
     model: string;
     answer: string;
+    inquiryId?: string;
 }
 
 interface ChatComponentProps {
@@ -18,17 +18,104 @@ const ChatComponent: React.FC<ChatComponentProps> = ({models, onChangeModels}) =
     const [statusMap, setStatusMap] = useState<Record<string, 'loading' | 'success' | 'error'>>({});
     const [inquiryContent, setInquiryContent] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [inquiryId, setInquiryId] = useState<string | undefined>();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const checkTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
+
+    const checkDatabaseForAnswer = async (model: string) => {
+        if (!inquiryId) return;
+
+        try {
+            const response = await fetch(
+                `http://localhost:9091/inquiry/answer?inquiryId=${inquiryId}&model=${model}`
+            );
+            
+            if (response.ok) {
+                const data = await response.json();
+                setAnswers(prev => ({...prev, [model]: data.answer}));
+                setStatusMap(prev => ({...prev, [model]: 'success'}));
+                if (checkTimeoutsRef.current[model]) {
+                    clearTimeout(checkTimeoutsRef.current[model]);
+                    delete checkTimeoutsRef.current[model];
+                }
+            } else {
+                if (statusMap[model] === 'loading') {
+                    checkTimeoutsRef.current[model] = setTimeout(() => checkDatabaseForAnswer(model), 3000);
+                }
+            }
+        } catch (error) {
+            console.error(`Error checking answer for model ${model}:`, error);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setAnswers({});
         setStatusMap(Object.fromEntries(models.map((model) => [model, 'loading'])));
+        setInquiryId(undefined);
+
+        Object.values(checkTimeoutsRef.current).forEach(timeout => clearTimeout(timeout));
+        checkTimeoutsRef.current = {};
 
         if (selectedFile) {
-            models.forEach((model) => sendImageToModel(model));
+            sendImageToModel(models[0]);
+            models.slice(1).forEach((model) => {
+                setTimeout(() => sendImageToModel(model), 100);
+            });
         } else {
-            models.forEach((model) => sendInquiryToModel(model));
+            sendInquiryToModel(models[0]);
+            models.slice(1).forEach((model) => {
+                setTimeout(() => sendInquiryToModel(model), 100);
+            });
+        }
+    };
+
+    const sendInquiryToModel = (model: string) => {
+        const eventSource = new EventSource(
+            `http://localhost:9091/inquiry/stream/single?inquiryContent=${encodeURIComponent(inquiryContent)}&model=${encodeURIComponent(model)}${inquiryId ? `&inquiryId=${inquiryId}` : ''}`
+        );
+
+        eventSource.onmessage = (event) => {
+            const data: Answer = JSON.parse(event.data);
+            setAnswers((prev) => ({...prev, [data.model]: data.answer}));
+            setStatusMap((prev) => ({...prev, [data.model]: 'success'}));
+            if (data.inquiryId) {
+                setInquiryId(data.inquiryId);
+            }
+            eventSource.close();
+        };
+
+        eventSource.onerror = (err) => {
+            console.error("EventSource error for model", model, ":", err);
+            setAnswers((prev) => ({...prev, [model]: "Failed to load response."}));
+            setStatusMap((prev) => ({...prev, [model]: 'error'}));
+            eventSource.close();
+
+            if (inquiryId) {
+                checkTimeoutsRef.current[model] = setTimeout(() => checkDatabaseForAnswer(model), 3000);
+            }
+        };
+    };
+
+    useEffect(() => {
+        return () => {
+            Object.values(checkTimeoutsRef.current).forEach(timeout => clearTimeout(timeout));
+        };
+    }, []);
+    
+    const retryModel = (model: string) => {
+        setAnswers((prev) => ({...prev, [model]: ""}));
+        setStatusMap((prev) => ({...prev, [model]: 'loading'}));
+        
+        if (checkTimeoutsRef.current[model]) {
+            clearTimeout(checkTimeoutsRef.current[model]);
+            delete checkTimeoutsRef.current[model];
+        }
+
+        if (selectedFile) {
+            sendImageToModel(model);
+        } else {
+            sendInquiryToModel(model);
         }
     };
 
@@ -39,43 +126,58 @@ const ChatComponent: React.FC<ChatComponentProps> = ({models, onChangeModels}) =
         reader.onload = async (e) => {
             const base64Image = e.target?.result as string;
 
-            const response = await fetch(`http://localhost:9091/inquiry/stream/image`, {
+            const eventSource = new EventSource(`http://localhost:9091/inquiry/stream/single/image`, {
+                withCredentials: false
+            });
+
+            // Send the POST request separately
+            fetch(`http://localhost:9091/inquiry/stream/single/image`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Accept": "text/event-stream",
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     model: model,
                     image: base64Image,
                     prompt: inquiryContent || "What's in this image?",
+                    inquiryId: inquiryId
                 }),
+            }).catch(error => {
+                console.error("Error sending image:", error);
+                setAnswers(prev => ({...prev, [model]: "Failed to send image."}));
+                setStatusMap(prev => ({...prev, [model]: 'error'}));
+                eventSource.close();
             });
 
-            const reader = response.body?.getReader();
-            const decoder = new TextDecoder("utf-8");
-            let result = "";
-
-            while (true) {
-                const {value, done} = await reader!.read();
-                if (done) break;
-
-                result += decoder.decode(value, {stream: true});
-
-                const events = result.split("\n\n");
-                for (const evt of events) {
-                    if (evt.startsWith("data:")) {
-                        try {
-                            const json = JSON.parse(evt.replace("data:", "").trim());
-                            setAnswers((prev) => ({...prev, [json.model]: json.answer}));
-                            setStatusMap((prev) => ({...prev, [json.model]: 'success'}));
-                        } catch (e) {
-                            console.error("Invalid SSE data:", e);
-                            setAnswers((prev) => ({...prev, [model]: "Failed to parse response."}));
-                            setStatusMap((prev) => ({...prev, [model]: 'error'}));
-                        }
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    setAnswers(prev => ({...prev, [data.model]: data.answer}));
+                    setStatusMap(prev => ({...prev, [data.model]: 'success'}));
+                    if (data.inquiry?.id) {
+                        setInquiryId(data.inquiry.id);
                     }
+                    eventSource.close();
+                } catch (e) {
+                    console.error("Invalid SSE data:", e);
+                    setAnswers(prev => ({...prev, [model]: "Failed to parse response."}));
+                    setStatusMap(prev => ({...prev, [model]: 'error'}));
+                    eventSource.close();
                 }
-            }
+            };
+
+            eventSource.onerror = () => {
+                console.error("EventSource error for model", model);
+                setAnswers(prev => ({...prev, [model]: "Failed to load response."}));
+                setStatusMap(prev => ({...prev, [model]: 'error'}));
+                eventSource.close();
+
+                if (inquiryId) {
+                    checkTimeoutsRef.current[model] = setTimeout(() => checkDatabaseForAnswer(model), 3000);
+                }
+            };
         };
 
         reader.readAsDataURL(selectedFile);
@@ -91,34 +193,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({models, onChangeModels}) =
         setSelectedFile(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
-        }
-    };
-
-    const sendInquiryToModel = (model: string) => {
-        const eventSource = new EventSource(`http://localhost:9091/inquiry/stream?inquiryContent=${encodeURIComponent(inquiryContent)}&model=${encodeURIComponent(model)}`);
-
-        eventSource.onmessage = (event) => {
-            const data: Answer = JSON.parse(event.data);
-            setAnswers((prev) => ({...prev, [data.model]: data.answer}));
-            setStatusMap((prev) => ({...prev, [data.model]: 'success'}));
-            eventSource.close();
-        };
-
-        eventSource.onerror = (err) => {
-            console.error("EventSource error for model", model, ":", err);
-            setAnswers((prev) => ({...prev, [model]: "Failed to load response."}));
-            setStatusMap((prev) => ({...prev, [model]: 'error'}));
-            eventSource.close();
-        };
-    };
-
-    const retryModel = (model: string) => {
-        setAnswers((prev) => ({...prev, [model]: ""}));
-        setStatusMap((prev) => ({...prev, [model]: 'loading'}));
-        if (selectedFile) {
-            sendImageToModel(model);
-        } else {
-            sendInquiryToModel(model);
         }
     };
 

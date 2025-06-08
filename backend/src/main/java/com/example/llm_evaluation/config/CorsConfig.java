@@ -8,9 +8,11 @@ import org.springframework.web.servlet.config.annotation.*;
 public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/inquiry/stream")
-                .allowedOrigins("http://localhost:3000") // React dev server
-                .allowedMethods("GET")
+        registry.addMapping("/inquiry/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "OPTIONS")
+                .allowedHeaders("Content-Type")
+                .exposedHeaders("Access-Control-Allow-Origin")
                 .allowCredentials(true);
         registry.addMapping("/models")
                 .allowedOrigins("http://localhost:3000")
