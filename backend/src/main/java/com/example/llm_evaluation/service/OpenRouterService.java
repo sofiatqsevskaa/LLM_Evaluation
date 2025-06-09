@@ -106,11 +106,11 @@ public class OpenRouterService {
                     + "]"
                     + "}]"
                     + "}";
-    } else {
-        return "{"
-                + "\"model\": \"" + model + "\","
-                + "\"messages\": [{\"role\": \"user\", \"content\": \"" + inquiry + "\"}]"
-                + "}";
+        } else {
+            return "{"
+                    + "\"model\": \"" + model + "\","
+                    + "\"messages\": [{\"role\": \"user\", \"content\": \"" + inquiry + "\"}]"
+                    + "}";
+        }
     }
-}
 }

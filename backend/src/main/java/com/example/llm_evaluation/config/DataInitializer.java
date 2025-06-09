@@ -21,7 +21,7 @@ public class DataInitializer {
     }
 
     @PostConstruct
-    public void initData() throws Exception {
+    public void initData() {
         Inquiry inquiry1 = new Inquiry("What is the capital of France?");
         inquiryRepository.save(inquiry1);
 
